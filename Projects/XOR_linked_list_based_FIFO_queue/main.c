@@ -3,7 +3,7 @@
 #include <stdio.h>
 struct Node {
     int value;
-    struct Node* pxn; //xor adresu elementu poprzedniego i nastepnego
+    struct Node* pxn; //xor of previous and next elements' addresses
 };
 
 struct Node* XOR(struct Node* a, struct Node* b)
@@ -96,10 +96,10 @@ void del_beg(struct Node** head, struct Node** tail, struct Node** front, struct
     if (*head == NULL) {
         return;
     }
-    else if ((*head) == (*tail)) { //lista jednoelementowa
+    else if ((*head) == (*tail)) { //list contains only one element
         *head = *tail = *front = *left_front = *back = *right_back = NULL;
     }
-    else if ((*head) == (XOR(NULL, (*tail)->pxn))) { //lista dwuelementowa
+    else if ((*head) == (XOR(NULL, (*tail)->pxn))) { //list contains exactly two elements
         *front = *back = *head = *tail;
         *left_front = *right_back = NULL;
         (*head)->pxn = XOR(NULL, NULL);
@@ -129,19 +129,19 @@ void del_beg(struct Node** head, struct Node** tail, struct Node** front, struct
 }
 
 void del_end(struct Node** head, struct Node** tail, struct Node** front, struct Node** left_front, struct Node** back, struct Node** right_back, int* size) {
-    struct Node* ntr = *tail; //struct Node to remove
+    struct Node* ntr = *tail; //Node to remove
     if ((*head) == NULL) {
         return;
     }
-    else if ((*head) == (*tail)) { //lista jednoelementowa
+    else if ((*head) == (*tail)) {
         *head = *tail = *front = *left_front = *back = *right_back = NULL;
     }
-    else if ((*tail) == (XOR(NULL, (*head)->pxn))) { //lista dwuelementowa
+    else if ((*tail) == (XOR(NULL, (*head)->pxn))) {
         *front = *back = *tail = *head;
         *left_front = *right_back = NULL;
         (*tail)->pxn = XOR(NULL, NULL);
     }
-    else { //lista trzyelementowa i wieksza
+    else {
         if ((*front == *tail) && (*tail != *back)) {
             struct Node* tmp = *front;
             *front = *left_front;
@@ -190,7 +190,7 @@ int count(struct Node* front, struct Node* back, struct Node* left_front, struct
 
 void push(struct Node** head, struct Node** tail, struct Node** front, struct Node** left_front, struct Node** back, struct Node** right_back, int value, int* size) {
     int queue_size = count(*front, *back, *left_front, *tail);
-    if (*head == NULL) { //pusta lista
+    if (*head == NULL) { //empty list
         add_beg(head, tail, front, left_front, value, size);
         *front = *back = *head;
     }
@@ -279,10 +279,10 @@ void print_queue(struct Node* front, struct Node* back, struct Node* left_front,
 }
 
 void garbage_soft(struct Node** head, struct Node** tail, struct Node** front, struct Node** left_front, struct Node** back, struct Node** right_back, int* size) {
-    if ((*head == NULL) || (*size == count(*front, *back, *left_front, *tail))) { //pusta lista lub wszystkie elementy listy sa w kolejce
+    if ((*head == NULL) || (*size == count(*front, *back, *left_front, *tail))) { //empty list or all elements from the list are also included in the queue
         return;
     }
-    else if (*back == NULL) { //pusta kolejka
+    else if (*back == NULL) { //empty queue
         struct Node* prev = NULL;
         struct Node* curr = *head;
         struct Node* next;
@@ -293,7 +293,7 @@ void garbage_soft(struct Node** head, struct Node** tail, struct Node** front, s
             curr = next;
         }
     }
-    else { //reszta przypadkow
+    else { //other cases
         struct Node* right = *back;
         struct Node* curr = XOR(*right_back, (*back)->pxn);
         struct Node* left;
@@ -421,7 +421,7 @@ int main()
             garbage_hard(&head, &tail, &front, &left_front, &back, &right_back, &size);
         }
     }
-    while (tail != NULL) { //zwalnianie pamieci
+    while (tail != NULL) { //freeing memory
         del_beg(&head, &tail, &front, &left_front, &back, &right_back, &size);
     }
     return 0;
