@@ -1,21 +1,25 @@
-#include <iostream>
-#include <string>
+#define _CRT_SECURE_NO_WARNINGS
+#define MAX_INSTRUCTION_LENGTH 25
+#include <stdio.h>
+
 struct Node {
     int value;
-    Node* pxn; //xor adresu elementu poprzedniego i nastepnego
+    struct Node* pxn; //xor of previous and next element
 };
-Node* XOR(Node* prev, Node* next)
+
+struct Node* XOR(struct Node* prev, struct Node* next)
 {
-    return (Node*)((uintptr_t)prev ^ (uintptr_t)next);
+    return (struct Node*)((uintptr_t)prev ^ (uintptr_t)next);
 }
-void add_beg(Node** head, Node** tail, Node** actual, Node** previous, int value)
+
+void add_beg(struct Node** head, struct Node** tail, struct Node** actual, struct Node** previous, int value)
 {
-    Node* new_node = new Node;
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
     new_node->value = value;
     new_node->pxn = XOR(*head, NULL);
     if (*head != NULL)
     {
-        Node* next = XOR((*head)->pxn, NULL);
+        struct Node* next = XOR((*head)->pxn, NULL);
         (*head)->pxn = XOR(new_node, next);
         *head = new_node;
         if (*previous == *tail) {
@@ -26,14 +30,15 @@ void add_beg(Node** head, Node** tail, Node** actual, Node** previous, int value
         *previous = *actual = *tail = *head = new_node;
     }
 }
-void add_end(Node** head, Node** tail, Node** actual, Node** previous, int value)
+
+void add_end(struct Node** head, struct Node** tail, struct Node** actual, struct Node** previous, int value)
 {
-    Node* new_node = new Node;
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
     new_node->value = value;
     new_node->pxn = XOR(*tail, NULL);
     if (*tail != NULL)
     {
-        Node* prev = XOR((*tail)->pxn, NULL);
+        struct Node* prev = XOR((*tail)->pxn, NULL);
         (*tail)->pxn = XOR(new_node, prev);
         *tail = new_node;
         if (*actual == *head) {
@@ -44,15 +49,16 @@ void add_end(Node** head, Node** tail, Node** actual, Node** previous, int value
         *previous = *actual = *head = *tail = new_node;
     }
 }
-void print_forward(Node* head)
+
+void print_forward(struct Node* head)
 {
     if (head == NULL) {
         printf("NULL\n");
     }
     else {
-        Node* curr = head;
-        Node* prev = NULL;
-        Node* next;
+        struct Node* curr = head;
+        struct Node* prev = NULL;
+        struct Node* next;
         while (curr != NULL)
         {
             printf("%d ", curr->value);
@@ -63,15 +69,16 @@ void print_forward(Node* head)
         printf("\n");
     }
 }
-void print_backward(Node* tail)
+
+void print_backward(struct Node* tail)
 {
     if (tail == NULL) {
         printf("NULL\n");
     }
     else {
-        Node* curr = tail;
-        Node* next = NULL;
-        Node* prev;
+        struct Node* curr = tail;
+        struct Node* next = NULL;
+        struct Node* prev;
         while (curr != NULL)
         {
             printf("%d ", curr->value);
@@ -82,7 +89,8 @@ void print_backward(Node* tail)
         printf("\n");
     }
 }
-int prev_act(Node** actual, Node** prev, Node** head, Node** tail) {
+
+int prev_act(struct Node** actual, struct Node** prev, struct Node** head, struct Node** tail) {
     int itr; //int to return
     if ((*actual) == (*head)) {
         itr = (*tail)->value;
@@ -91,7 +99,7 @@ int prev_act(Node** actual, Node** prev, Node** head, Node** tail) {
     }
     else {
         itr = (*prev)->value;
-        Node* tmp = *actual;
+        struct Node* tmp = *actual;
         *actual = *prev;
         if ((*actual) != (*head)) {
             *prev = XOR(tmp, (*actual)->pxn);
@@ -102,7 +110,8 @@ int prev_act(Node** actual, Node** prev, Node** head, Node** tail) {
     }
     return itr;
 }
-int next_act(Node** actual, Node** prev, Node** head, Node** tail) {
+
+int next_act(struct Node** actual, struct Node** prev, struct Node** head, struct Node** tail) {
     int itr; //int to return
     if ((*actual) == (*tail)) {
         itr = (*head)->value;
@@ -110,7 +119,7 @@ int next_act(Node** actual, Node** prev, Node** head, Node** tail) {
         *prev = *tail;
     }
     else {
-        Node* next;
+        struct Node* next;
         if ((*actual) != (*head)) {
             next = XOR(*prev, (*actual)->pxn);
         }
@@ -123,8 +132,9 @@ int next_act(Node** actual, Node** prev, Node** head, Node** tail) {
     }
     return itr;
 }
-void del_beg(Node** actual, Node** prev, Node** head, Node** tail) {
-    Node* ntr = *head;
+
+void del_beg(struct Node** actual, struct Node** prev, struct Node** head, struct Node** tail) {
+    struct Node* ntr = *head;
     if (*head == NULL) {
         return;
     }
@@ -136,8 +146,8 @@ void del_beg(Node** actual, Node** prev, Node** head, Node** tail) {
         *head = *prev = *actual = *tail;
     }
     else { //lista trzyelementowa i wieksza
-        Node* tmp1;
-        Node* tmp2;
+        struct Node* tmp1;
+        struct Node* tmp2;
         tmp1 = XOR(NULL, (*head)->pxn);
         tmp2 = XOR(tmp1->pxn, (*head));
         if ((*actual) == (*head)) {
@@ -154,10 +164,11 @@ void del_beg(Node** actual, Node** prev, Node** head, Node** tail) {
         }
         (*head)->pxn = XOR(NULL, tmp2);
     }
-    delete ntr;
+    free(ntr);
 }
-void del_end(Node** actual, Node** prev, Node** head, Node** tail) {
-    Node* ntr = *tail; //Node to remove
+
+void del_end(struct Node** actual, struct Node** prev, struct Node** head, struct Node** tail) {
+    struct Node* ntr = *tail; //struct Node to remove
     if ((*head) == NULL) {
         return;
     }
@@ -169,8 +180,8 @@ void del_end(Node** actual, Node** prev, Node** head, Node** tail) {
         *tail = *prev = *actual = *head;
     }
     else { //lista trzyelementowa i wieksza
-        Node* tmp1;
-        Node* tmp2;
+        struct Node* tmp1;
+        struct Node* tmp2;
         tmp1 = XOR(NULL, (*tail)->pxn);
         tmp2 = XOR(tmp1->pxn, *tail);
         if ((*actual) == (*tail)) {
@@ -187,11 +198,12 @@ void del_end(Node** actual, Node** prev, Node** head, Node** tail) {
         }
         (*tail)->pxn = XOR(NULL, tmp2);
     }
-    delete ntr;
+    free(ntr);
 }
-void add_act(Node** actual, Node** prev, Node** head, int value) {
-    Node* new_node = new Node;
-    Node* tmp1;
+
+void add_act(struct Node** actual, struct Node** prev, struct Node** head, int value) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    struct Node* tmp1;
     new_node->value = value;
     if ((*actual) == (*head)) {
         new_node->pxn = XOR(NULL, *actual);
@@ -200,7 +212,7 @@ void add_act(Node** actual, Node** prev, Node** head, int value) {
         *prev = *head = new_node;
     }
     else {
-        Node* tmp2;
+        struct Node* tmp2;
         new_node->pxn = XOR(*prev, *actual);
         tmp1 = XOR((*prev)->pxn, *actual);
         tmp2 = XOR((*actual)->pxn, *prev);
@@ -209,7 +221,8 @@ void add_act(Node** actual, Node** prev, Node** head, int value) {
         *prev = new_node;
     }
 }
-void del_act(Node** actual, Node** prev, Node** head, Node** tail) {
+
+void del_act(struct Node** actual, struct Node** prev, struct Node** head, struct Node** tail) {
     if ((*head) == NULL) {
         return;
     }
@@ -220,10 +233,10 @@ void del_act(Node** actual, Node** prev, Node** head, Node** tail) {
         del_end(actual, prev, head, tail);
     }
     else {
-        Node* pp; //previous previous
-        Node* next;
-        Node* nn; //next next
-        Node* ntr = *actual; //Node to remove
+        struct Node* pp; //previous previous
+        struct Node* next;
+        struct Node* nn; //next next
+        struct Node* ntr = *actual; //struct Node to remove
         pp = XOR(*actual, (*prev)->pxn);
         next = XOR(*prev, (*actual)->pxn);
         nn = XOR(*actual, next->pxn);
@@ -237,16 +250,17 @@ void del_act(Node** actual, Node** prev, Node** head, Node** tail) {
             *actual = *prev;
             *prev = pp;
         }
-        delete ntr;
+        free(ntr);
     }
 }
-void del_val(Node** actual, Node** prev, Node** head, Node** tail, int value) {
+
+void del_val(struct Node** actual, struct Node** prev, struct Node** head, struct Node** tail, int value) {
     if (*head == NULL) {
         return;
     }
-    Node* previous = NULL;
-    Node* curr = *head;
-    Node* next;
+    struct Node* previous = NULL;
+    struct Node* curr = *head;
+    struct Node* next;
     while (curr != NULL) {
         next = XOR(previous, curr->pxn);
         if (curr->value == value) {
@@ -260,15 +274,15 @@ void del_val(Node** actual, Node** prev, Node** head, Node** tail, int value) {
                 del_act(actual, prev, head, tail);
             }
             else {
-                Node* ntr = curr;
-                Node* nn = XOR(curr, next->pxn); //next next
-                Node* pp = XOR(previous->pxn, curr); //previous previous
+                struct Node* ntr = curr;
+                struct Node* nn = XOR(curr, next->pxn); //next next
+                struct Node* pp = XOR(previous->pxn, curr); //previous previous
                 if (curr == *prev) {
                     *prev = XOR(*actual, (*prev)->pxn);
                 }
                 next->pxn = XOR(previous, nn);
                 previous->pxn = XOR(pp, next);
-                delete ntr;
+                free(ntr);
             }
             curr = NULL;
         }
@@ -278,30 +292,31 @@ void del_val(Node** actual, Node** prev, Node** head, Node** tail, int value) {
         curr = next;
     }
 }
+
 int main()
 {
-    Node* head = NULL;
-    Node* tail = NULL;
-    Node* actual = NULL;
-    Node* prev = NULL;
-    std::string input;
+    struct Node* head = NULL;
+    struct Node* tail = NULL;
+    struct Node* actual = NULL;
+    struct Node* prev = NULL;
+    char input[MAX_INSTRUCTION_LENGTH];
     int value;
-    while (std::cin >> input) {
-        if (input == "ADD_BEG") {
-            std::cin >> value;
+    while (scanf("%s", input)!=EOF) {
+        if (!strcmp(input, "ADD_BEG")) {
+            scanf("%d", &value);
             add_beg(&head, &tail, &actual, &prev, value);
         }
-        else if (input == "ADD_END") {
-            std::cin >> value;
+        else if (!strcmp(input, "ADD_END")) {
+            scanf("%d", &value);
             add_end(&head, &tail, &actual, &prev, value);
         }
-        else if (input == "PRINT_FORWARD") {
+        else if (!strcmp(input, "PRINT_FORWARD")) {
             print_forward(head);
         }
-        else if (input == "PRINT_BACKWARD") {
+        else if (!strcmp(input, "PRINT_BACKWARD")) {
             print_backward(tail);
         }
-        else if (input == "ACTUAL") {
+        else if (!strcmp(input, "ACTUAL")) {
             if (actual != NULL) {
                 printf("%d\n", actual->value);
             }
@@ -309,7 +324,7 @@ int main()
                 printf("NULL\n");
             }
         }
-        else if (input == "PREV") {
+        else if (!strcmp(input, "PREV")) {
             if (actual != NULL) {
                 printf("%d\n", prev_act(&actual, &prev, &head, &tail));
             }
@@ -317,7 +332,7 @@ int main()
                 printf("NULL\n");
             }
         }
-        else if (input == "NEXT") {
+        else if (!strcmp(input, "NEXT")) {
             if (actual != NULL) {
                 printf("%d\n", next_act(&actual, &prev, &head, &tail));
             }
@@ -325,21 +340,21 @@ int main()
                 printf("NULL\n");
             }
         }
-        else if (input == "DEL_BEG") {
+        else if (!strcmp(input, "DEL_BEG")) {
             del_beg(&actual, &prev, &head, &tail);
         }
-        else if (input == "DEL_END") {
+        else if (!strcmp(input, "DEL_END")) {
             del_end(&actual, &prev, &head, &tail);
         }
-        else if (input == "ADD_ACT") {
-            std::cin >> value;
+        else if (!strcmp(input, "ADD_ACT")) {
+            scanf("%d", &value);
             add_act(&actual, &prev, &head, value);
         }
-        else if (input == "DEL_ACT") {
+        else if (!strcmp(input, "DEL_ACT")) {
             del_act(&actual, &prev, &head, &tail);
         }
-        else if (input == "DEL_VAL") {
-            std::cin >> value;
+        else if (!strcmp(input, "DEL_VAL")) {
+            scanf("%d", &value);
             del_val(&actual, &prev, &head, &tail, value);
         }
     }
