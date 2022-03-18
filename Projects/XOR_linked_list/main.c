@@ -138,14 +138,14 @@ void del_beg(struct Node** actual, struct Node** prev, struct Node** head, struc
     if (*head == NULL) {
         return;
     }
-    else if ((*head) == (*tail)) { //lista jednoelementowa
+    else if ((*head) == (*tail)) { //list contains only one element
         *actual = *prev = *head = *tail = NULL;
     }
-    else if ((*head) == (XOR(NULL, (*tail)->pxn))) { //lista dwuelementowa
+    else if ((*head) == (XOR(NULL, (*tail)->pxn))) { //list contains exactly two elements
         (*tail)->pxn = XOR(NULL, NULL);
         *head = *prev = *actual = *tail;
     }
-    else { //lista trzyelementowa i wieksza
+    else { //list contains three elements or more
         struct Node* tmp1;
         struct Node* tmp2;
         tmp1 = XOR(NULL, (*head)->pxn);
@@ -172,14 +172,14 @@ void del_end(struct Node** actual, struct Node** prev, struct Node** head, struc
     if ((*head) == NULL) {
         return;
     }
-    else if ((*head) == (*tail)) { //lista jednoelementowa
+    else if ((*head) == (*tail)) {
         *actual = *prev = *head = *tail = NULL;
     }
-    else if ((*tail) == (XOR(NULL, (*head)->pxn))) { //lista dwuelementowa
+    else if ((*tail) == (XOR(NULL, (*head)->pxn))) {
         (*head)->pxn = XOR(NULL, NULL);
         *tail = *prev = *actual = *head;
     }
-    else { //lista trzyelementowa i wieksza
+    else {
         struct Node* tmp1;
         struct Node* tmp2;
         tmp1 = XOR(NULL, (*tail)->pxn);
@@ -236,7 +236,7 @@ void del_act(struct Node** actual, struct Node** prev, struct Node** head, struc
         struct Node* pp; //previous previous
         struct Node* next;
         struct Node* nn; //next next
-        struct Node* ntr = *actual; //struct Node to remove
+        struct Node* ntr = *actual; //Node to remove
         pp = XOR(*actual, (*prev)->pxn);
         next = XOR(*prev, (*actual)->pxn);
         nn = XOR(*actual, next->pxn);
@@ -358,7 +358,7 @@ int main()
             del_val(&actual, &prev, &head, &tail, value);
         }
     }
-    while (tail != NULL) { //zwalnianie pamieci
+    while (tail != NULL) { //freeing memory
         del_beg(&actual, &prev, &head, &tail);
     }
     return (0);
